@@ -2,7 +2,7 @@ from productDAO import productDAO
 from customerDAO import customerDAO
 from flask import Flask, render_template, request, jsonify, abort
 
-app = Flask(__name__, static_url_path='', static_folder='static')
+app = Flask(__name__, static_url_path='', static_folder='templates')
 
 @app.route('/')
 def index():

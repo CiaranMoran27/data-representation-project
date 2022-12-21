@@ -1,0 +1,415 @@
+<html>
+    <head>
+        <title>View Products</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    </head>
+    <body>
+    <br/>
+
+        <div><label for="customerUserName">Email Address:</label></div>
+        <div><input type="email" id="customerUserName" name="checkCustomer" value="andrewbeatty@shophere.com"></div>
+        <div><label for="customerPassWord">Password:</label></div>
+        <div><input type="text" id="customerPassWord" name="checkCustomer" value = "pass123"></div>
+        <div><button id="button-readCustomer" onclick="doReadCustomer()">Validate Customer</button><br/></div>
+        <div><button id="button-createCustomer" onclick="doCreateIfValidCustomer()">Register Customer</button><br/></div>
+        <div><button id="button-alterProduct" onclick="doDeleteCustomer()">Delete Customer</button><br/></div>
+        <div><button id="button-alterProduct" onclick="doCustomerCashUpdate(customer)">Update Customer Cash + 100 (works after customer is Validated</button><br/></div>
+
+        <br/><br/> 
+
+        <div><label for="productID">Product id for update</label></div>
+        <div><input type="text" id="productID" name="productID" value="hat01"></div>
+        <div><label for="productQty">Product quantity purchaes</label></div>
+        <div><input type="text" id="productQty" name="productQty" value=1></div>
+        <div><button id="button-deleteCustomer" onclick="doProductQtyUpdate()">Update Quantity</button><br/></div>
+        
+
+        <!-- need to update the X & Y variables to customer name and balance --> 
+        <br/><br/>
+        <div id="customerBalance">Welcome to the Shop X, your current Balance is Y euro.</div>
+
+        <h1 id="productTableTitle">Products</h1>
+        <div>
+            <table border="1" id="productTable">
+                <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock Quantity</th>
+                        <th>Order Quantity</th>
+                        <th>Checkout</th>
+                </tr>
+            </table><br/>
+        </div>
+
+    </body>
+    <script>
+
+
+
+        //  **************************************lecturer's functions *************************************
+        function container_to_hold_lectuers_functions(){
+            function getBookFromRow(rowElement){
+                var book = {}
+                book.id  = rowElement.cells[0].firstChild.textContent
+                book.title = rowElement.cells[1].firstChild.textContent
+                book.author = rowElement.cells[2].firstChild.textContent
+                book.price = rowElement.cells[3].firstChild.textContent
+                return book
+            }
+            function setCustomerInRow(rowElement, customer){
+                rowElement.cells[0].firstChild.textContent= customer.email  
+                rowElement.cells[1].firstChild.textContent= customer.password 
+                rowElement.cells[2].firstChild.textContent= customer.cash
+
+            }
+            function doCreate(){ // create a new customer profile...
+                console.log("creating a book")
+                book = getBookFromForm()
+                //console.log(book)
+                // I need to wait until I get the id from the server before adding this to the table
+                // so  I put that code in the callback function
+                createBook(convertDisplayBookToServerBook(book), processCreateResponse)          
+            }
+            function doUpdate(){ // update customer cash...
+                book= getBookFromForm()
+                //console.log(book)
+                var rowElement = document.getElementById(book.id)
+                setBookInRow(rowElement, book)
+                // now I am updating on the server
+                // yes there is a change that it will be updated on the table and not the server
+                updateBook(convertDisplayBookToServerBook(book), doNothing)
+        
+                showViewall()
+                clearForm()
+            }
+            function doDelete(buttonElement){
+                console.log("in delete")
+                var tableElement = document.getElementById('productTable')
+                var rowElement = buttonElement.parentNode.parentNode;
+                // I need the book id
+                id = rowElement.getAttribute("id")
+                console.log("deleting "+id)
+                deleteBook(id, doNothing)
+            
+                index = rowElement.rowIndex
+                tableElement.deleteRow(index);
+            }
+            function convertServerBookToDisplayBook(book){
+            displayBook = {}
+            displayBook.id = book.id
+            displayBook.author = book.Author
+            displayBook.title = book.Title
+            displayBook.price = book.Price
+            return displayBook
+        }
+            function showViewall(){     
+                document.getElementById("button-showCreate").style.display = "block"
+                document.getElementById("productTable").style.display = "block"
+                document.getElementById("customerBalance").style.display = "block"              
+            }
+         }
+        //  **************************************lecturer's functions *************************************
+
+
+
+		// ***********************************************table**********************************************
+        function showProductInfo(){
+                document.getElementById("customerBalance").style.display = "block";
+                document.getElementById("productTableTitle").style.display = "block";
+                document.getElementById("productTable").style.display = "block";
+            }
+        function hideProductInfo(){
+            document.getElementById("customerBalance").style.display = "none"
+            document.getElementById("productTableTitle").style.display = "none";
+            document.getElementById("productTable").style.display = "none"
+        }    
+        function addProductToTable(product){
+            console.log(product)
+            var tableElement = document.getElementById('productTable')
+            var rowElement = tableElement.insertRow(-1)
+
+            rowElement.setAttribute('id',product.ID)
+            
+            var cell1 = rowElement.insertCell(0);
+            cell1.innerHTML = product.ID
+            var cell2 = rowElement.insertCell(1);
+            cell2.innerHTML = product.NAME
+            var cell3 = rowElement.insertCell(2);
+            cell3.innerHTML = product.PRICE
+            var cell4 = rowElement.insertCell(3);
+            cell4.innerHTML = product.QTY
+            var cell5 = rowElement.insertCell(4);
+            var cell6 = rowElement.insertCell(5);
+        }
+		// ***********************************************table**********************************************
+
+
+  		// ********************************************formatting********************************************    
+        function convertDisplayCustomerToServerCustomer(c){
+
+            serverCustomer = {}
+            serverCustomer.email = c.email
+            serverCustomer.pass = c.pass
+            serverCustomer.cash = parseInt(c.cash)
+            return serverCustomer
+
+        }
+        function convertServerCustomerToDisplayCustomer(c){
+            displayCustomer = {}
+            displayCustomer.email = c.email
+            displayCustomer.pass = c.pass
+            displayCustomer.cash = c.cash
+
+            return displayCustomer
+        }
+  		// ********************************************formatting********************************************    
+
+
+        // I should set this as the default function for the callback how do i do this?
+        function doNothing(result){ 
+            return "done"
+        }
+
+
+        //  ****************************create customer if doesnt already exist *****************************
+        function doCreateIfValidCustomer(){
+
+            getAllCustomers(processGetAllCustomers)
+
+            function processCreateResponse(result){
+                    convertServerCustomerToDisplayCustomer(result)
+            }
+
+            function processGetAllCustomers(result){
+                    customerNew = {}
+                    customerNew.email = document.getElementById("customerUserName").value
+                    customerNew.pass = document.getElementById("customerPassWord").value
+                    customerNew.cash = 100
+
+                    var counter = 0
+                    for (customer of result){
+                        if(customer.EMAIL === customerNew.email){
+                            counter ++
+                        }
+                    }
+
+                    if(counter === 0){
+                        createCustomer(convertDisplayCustomerToServerCustomer(customerNew), processCreateResponse)
+                    }else{
+                        alert("This Customer Email already exits...")
+                    }   
+            }
+        } 
+        //  ****************************create customer if doesnt already exist *****************************
+
+
+
+        //****************************************delete customer ******************************************
+        function doDeleteCustomer(){
+            var id = document.getElementById("customerUserName").value
+            deleteBook(id, doNothing)           
+        }
+        //****************************************delete customer ******************************************
+
+
+
+
+        //*****************read and validate customer - show all products if validated************************
+        function doReadCustomer(){
+            var emailInput = document.getElementById("customerUserName").value
+            // I need to wait until I get the id from the server before adding this to the table
+            // so  I put that code in the callback function
+            getCustomerById((emailInput), processGetCustomerById)
+
+            function processGetCustomerById(result){
+                // this function deals with callback
+                for (customerAttribute of result){
+                    customer.email = customerAttribute.EMAIL
+                    customer.pass = customerAttribute.PASSWORD
+                    customer.cash = customerAttribute.CASH
+
+                    // for testing purposes************* added here since customer cash will only
+                    doCustomerCashUpdate(customer)
+                    // for testing purposes*************
+                }
+                if (validLoginCredentials(customer) === true) {
+                    getAllProducts(processGetAllProductResponse)
+                    showProductInfo();
+                } else{
+                    alert("In-correct Email or Password, please try again...")
+                }
+            }
+        }
+        function processGetAllProductResponse(result){
+            for (product of result){
+                displayProduct = {}
+                displayProduct.id = product.ID
+                displayProduct.name = product.NAME
+                displayProduct.price = product.PRICE
+                displayProduct.qty = product.QTY
+                addProductToTable(product)
+            }
+        }
+        function validLoginCredentials(customer){
+            var emailInput = document.getElementById("customerUserName").value
+            var passWordInput = document.getElementById("customerPassWord").value
+            if (emailInput === customer.email && passWordInput === customer.pass){
+                return true;
+            }        
+        }  
+        //*****************read and validate customer - show all products if validated************************
+
+
+
+        //****************************************update customer Cash ***************************************
+        function doCustomerCashUpdate(customer){ 
+                customer.cash = customer.cash + 100
+                updateCustomerCash(convertDisplayCustomerToServerCustomer(customer), doNothing)
+        }
+        //****************************************update customer Cash ***************************************
+
+    
+        //***************************************update product quantity**************************************
+        function doProductQtyUpdate(){ 
+
+            var productID = document.getElementById("productID").value
+            var productQty = document.getElementById("productQty").value
+            var productTransaction = {"id":productID, "qty": productQty}
+            updateProductQty(productTransaction, doNothing)
+        }
+        //***************************************update product quantity**************************************
+
+
+
+// /*
+        
+        //********************************************AJAX FILES TO BE MOVED ***********************************
+			
+    function getAllProducts(callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/shop",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                console.log(result);
+                callback(result)
+     
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    } 
+
+    function getAllCustomers(callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/customers",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                console.log(result);
+                callback(result);
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    } 
+
+    function getCustomerById(id, callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/customers/"+encodeURI(id),
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                console.log(result)
+                callback(result)
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    } 
+
+    function updateCustomerCash(customer, callback){
+        console.log(customer)
+            $.ajax({   
+                "url": "http://127.0.0.1:5000/customers/"+encodeURI(customer.email),
+                "method":"PUT",
+                "data":JSON.stringify(customer),
+                "dataType": "JSON",
+                contentType: "application/json; charset=utf-8",
+                "success":function(result){
+                    //console.log({updateCustomerCashResult: result});
+                    callback(result)   
+                },
+                "error":function(xhr,status,error){
+                    console.log("error: "+status+" msg:"+error);
+                }
+            });
+        }
+
+        function createCustomer(customer, callback){
+            $.ajax({
+                "url": "http://127.0.0.1:5000/customers",
+                "method":"POST",
+                "data":JSON.stringify(customer),
+                "dataType": "JSON",
+                contentType: "application/json; charset=utf-8",
+                "success":function(result){
+                    console.log(result);
+                    callback(result)  
+                },
+                "error":function(xhr,status,error){
+                    console.log("error: "+status+" msg:"+error);
+                }
+            });
+
+        }
+
+        function deleteBook(id, callback){
+            $.ajax({
+                "url": "http://127.0.0.1:5000/customers/"+encodeURI(id),
+                "method":"DELETE",
+                "data":JSON.stringify(id),
+                "dataType": "JSON",
+                contentType: "application/json; charset=utf-8",
+                "success":function(result){
+                    console.log(result);
+                    callback(result)  
+                },
+                "error":function(xhr,status,error){
+                    console.log("error: "+status+" msg:"+error);
+                }
+            });
+
+        }
+
+        function updateProductQty(productTransaction, callback){
+            $.ajax({   
+                "url": "http://127.0.0.1:5000/shop/"+encodeURI(productTransaction.id),
+                "method":"PUT",
+                "data":JSON.stringify(productTransaction),
+                "dataType": "JSON",
+                contentType: "application/json; charset=utf-8",
+                "success":function(result){
+                    //console.log("put request");
+                    console.log({updateProductQtyResult: result});
+                    callback(result)   
+                },
+                "error":function(xhr,status,error){
+                    console.log("error: "+status+" msg:"+error);
+                }
+            });
+        }
+    // ********************************************AJAX FILES TO BE MOVED ***********************************	
+       
+    hideProductInfo()
+    var customer = {};
+// */
+    </script>
+</html>
