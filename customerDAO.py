@@ -157,7 +157,7 @@ class customerDAO:
         Read csv data and create sql table
         '''
         data = []
-        with open('../loadData/customer.csv') as csv_file:
+        with open('loadData/customer.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter = ',')
             for row in csv_reader:
                 data.append(
@@ -192,7 +192,7 @@ customerDAO = customerDAO()
 
 if __name__ == "__main__":
 
-    customerDAO.createDatabase
+    customerDAO.dropTable()
     createTable = customerDAO.createTable()
     if createTable:
         customerDAO.initialCreate()
