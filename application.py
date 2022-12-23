@@ -6,7 +6,11 @@ app = Flask(__name__, static_url_path='', static_folder='templates')
 
 @app.route('/')
 def index():
-    return render_template('interface.html')
+    return render_template('Products.html')
+
+@app.route('/Products')
+def products():
+    return render_template('Products.html')
 
 #*****************************************
 @app.route('/customers', methods=['GET'])

@@ -125,7 +125,7 @@ class productDAO:
         Read csv data and create sql table
         '''
         data = []
-        with open('/loadData/product.csv') as csv_file:
+        with open('loadData/product.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter = ',')
             for row in csv_reader:
                 data.append(
