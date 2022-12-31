@@ -56,7 +56,6 @@ class productDAO:
     def updateQuantity(self, values):
 
         try:
-            print(values)
             cursor = self.getCursor()
             sql="update product set QTY = QTY - %s where ID = %s"
             cursor.execute(sql, values)
