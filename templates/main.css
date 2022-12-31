@@ -49,9 +49,12 @@ body{
 
 .pageContainer{
   display: flex;
+  flex-direction: column;
+  text-align: center;
   margin: 30px;
-  gap: 30px;
+  gap: 10px;
 }
+
 
 .tableContainer{
 	display: flex;
@@ -97,4 +100,28 @@ body{
 .inputSpinner{
     display: flex;
     flex-direction: row;
+}
+
+
+.loginContainer{
+	display: flex;
+  flex-direction: column;
+  align-content: center;
+  align-items: center;
+}
+.navTabs{
+	display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.input{
+  display: flex;
+  text-align: left;
+  flex-direction: column;
+  width: 400px;
+}
+.updateCash{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

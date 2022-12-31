@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- https://www.w3schools.com/tags/tag_link.asp -->
+	<!-- link to add style and icon for the tab -->
+	<link rel="icon" href="gmitLogo.png">
+	<link rel="stylesheet" href="main.css">
+	<!-- title that goes in the browser tab -->
+	<title>Login</title>
+    <!--Jquery for dom manipulation-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <!--Bootstrap for pills and button styling-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script>
+    function login(){
+         var email = $('#emailTab1').val();
+         var password = $('#passwordTab1').val();
+         var customer = {email, password}
+            
+        if(email && password){
+            processLogin((customer), processCheckCustomerById)
+            function processCheckCustomerById(result){
+                customer.email = result.email
+                customer.password = result.password
+            }
+        }else{
+            alert('Fill in the required details...')
+        }
+    }
+        
+    function registerUser(){
+        var email = $('#emailTab2').val();
+        var password = $('#passwordTab2').val();
+        function processGetAllCustomers(result){
+            customerNew = {}
+            customerNew.email = email
+            customerNew.pass = password
+            customerNew.cash = 0
+            var counter = 0
+            for (customer of result){
+                if(customer.EMAIL === customerNew.email){
+                    counter ++
+                }
+            }
+            if(counter === 0){
+                createCustomer(customerNew, doNothing)
+            }else{
+                alert("This Customer Email already exits...")
+            }   
+        }
+
+        if(email.includes('@') === false){
+            alert('Enter a valid email address...')
+        }
+        else if (email.length < 1  || password.length < 1){
+            alert('Fill in the required details...')
+        }else{
+            getAllCustomers(processGetAllCustomers)
+        }
+    }
+
+   function deleteUser(){
+        var email = $('#emailTab3').val();
+        if(email){
+            deleteUserReq(email, doNothing);
+        }else{
+            alert('Fill in the required details...')
+        }
+    }
+
+    function doNothing(result){ 
+            return "done"
+        }
+
+    function processLogin(customer, callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/processlogin/" +encodeURI(customer.email) + "/" +encodeURI(customer.password),
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                if(result.canLogin === true){
+                    var email = $('#emailTab1').val();
+                    callback(result)
+                    //https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+                    //saves logged in user to localStorage
+                    localStorage.setItem('email', email);
+                    //Redirects to root so api can handle redirect   
+                    document.location.href="/";
+                }else{
+                    alert('Invalid Login Details, please try again...')
+                }
+            },
+            "error":function(xhr,status,error){
+                alert("Login failed. Please check your username and password")
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    } 
+
+    function deleteUserReq(id, callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/customers/"+encodeURI(id),
+            "method":"DELETE",
+            "data":JSON.stringify(id),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){ 
+                if(result.customerDeleted === true){
+                    alert("User Deleted: " + result)
+                    callback(result)  
+                }  
+            },
+            "error":function(xhr,status,error){
+                alert("User delete failed");
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function createCustomer(customer, callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/customers",
+            "method":"POST",
+            "data":JSON.stringify(customer),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                if(result.createdUser === true){
+                    alert("User Created: " + result)
+                    callback(result)  
+                }   
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function getAllCustomers(callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/customers",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                console.log(result);
+                callback(result);
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    } 
+
+</script>
+</head>
+<body">
+	<div class="topnav">
+		<a  class="active" href="./Login.html">Login</a>
+	</div>
+	<div class="mainContainer">
+		<div class="pageContainer">
+            <h1>Login</h1>
+            <ul id="nav" class="nav nav-tabs navTabs">
+                <li class="active"><a href="#Tab1" data-toggle="tab">Login</a></li>
+                <li><a href="#Tab2" data-toggle="tab">Register</a></li>
+                <li><a href="#Tab3" data-toggle="tab">Delete</a></li>
+            </ul>
+            <div class="tab-content clearfix">
+                    <div class="tab-pane active" id="Tab1">
+                        <div class="loginContainer">
+                            <div class="input">
+                                <span>E-mail</span>
+                                <input id="emailTab1" type="email" name = "email" placeholder="Please enter email..."></input>
+                            </div>
+                            <div class="input">
+                                <span>Password</span>
+                                <input id="passwordTab1" type="password" placeholder="Please enter password..."></input>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="login()">Login</button>
+                    </div>
+                    <div class="tab-pane" id="Tab2">
+                        <div class="loginContainer">
+                            <div class="input">
+                                <span>E-mail</span>
+                                <input id="emailTab2" type="email" name = "email" placeholder="Please enter email..."></input>
+                            </div>
+                            <div class="input">
+                                <span>Password</span>
+                                <input id="passwordTab2" type="password" placeholder="Please enter password..."></input>
+                            </div>
+                        </div>
+                        <button  class="btn btn-success" onclick="registerUser()">Register</button>
+                    </div>
+                <div class="tab-pane" id="Tab3">
+                    <div class="loginContainer">
+                    <div class="input">
+                        <span>E-mail</span>
+                        <input id="emailTab3" type="email" name = "email"  placeholder="Please enter email..."></input>
+                    </div>
+                    </div>
+                    <button  class="btn btn-success" onclick="deleteUser()">Delete</button>
+                </div>
+                </div>
+            </div>
+		</div>
+	</div>
+</body>
+</html>

@@ -78,19 +78,15 @@ class customerDAO:
             sql="select * from Customer where EMAIL = %s"
             values = (id,)
             cursor.execute(sql, values)
+
             result = cursor.fetchall()
+            result = [{'EMAIL': result[0][0],  'PASSWORD': result[0][1], 'CASH': result[0][2]}]
+            self.closeAll()
+            return result
 
-            if result == None:
-                self.closeAll()
-                return "Invalid login or username, please try again..."
-            else:
-
-                result = [{'EMAIL': result[0][0],  'PASSWORD': result[0][1], 'CASH': result[0][2]}]
-                self.closeAll()
-                return result
-
-        except mysql.connector.Error as err:
-            return "Something went wrong: {}".format(err)
+        except Exception:
+            self.closeAll()
+            return False
 
     def updateCash(self, values):  
 
@@ -192,7 +188,9 @@ customerDAO = customerDAO()
 
 if __name__ == "__main__":
 
-    customerDAO.dropTable()
+
+    customerDAO.createDatabase()
+    #customerDAO.dropTable()
     createTable = customerDAO.createTable()
     if createTable:
         customerDAO.initialCreate()

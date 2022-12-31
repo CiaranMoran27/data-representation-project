@@ -59,14 +59,13 @@ class productDAO:
             print(values)
             cursor = self.getCursor()
             sql="update product set QTY = QTY - %s where ID = %s"
-            #sql="update product set QTY = QTY - '2' where ID = 'hat01'"
-            #cursor.execute(sql, values)
             cursor.execute(sql, values)
             self.connection.commit()
             self.closeAll()
             
-        except mysql.connector.Error as err:
-            return "Something went wrong...: {}".format(err)
+        except Exception:
+            self.closeAll()
+            return False
 
 
     def createDatabase(self):
@@ -159,7 +158,9 @@ productDAO = productDAO()
 
 if __name__ == "__main__":
 
-    productDAO.dropTable()
+
+    productDAO.createDatabase()
+    #productDAO.dropTable()
     createTable = productDAO.createTable()
     if createTable:
         productDAO.initialCreate()

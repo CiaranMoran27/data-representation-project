@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<!-- https://www.w3schools.com/tags/tag_link.asp -->
 	<!-- link to add style and icon for the tab -->
@@ -8,105 +7,153 @@
 	<link rel="stylesheet" href="main.css">
 	<!-- title that goes in the browser tab -->
 	<title>Shop</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
+    <!--Jquery for dom manipulation-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
-    <script>
-        window.onload = function() {
-  yourFunction(param1, param2);
-};
-function addProductToTable(product){
-            var tableElement = document.getElementById('productTable')
-            var rowElement = tableElement.insertRow(-1)
-            var orderQuantity = 1;
-            rowElement.setAttribute('id',product.ID)
-            
-            var cell1 = rowElement.insertCell(0);
-            cell1.innerHTML = product.id
-            var cell2 = rowElement.insertCell(1);
-            cell2.innerHTML = product.name
-            var cell3 = rowElement.insertCell(2);
-            cell3.innerHTML = product.price
-            var cell4 = rowElement.insertCell(3);
-            cell4.innerHTML = product.qty
-            var cell5 = rowElement.insertCell(4);
-            cell5.innerHTML = '<div class="inputSpinner"><div class="buyButton" id="'+product.id+'QtyDown"><</div><div>'+orderQuantity+'</div><div id="'+product.id+'QtyUp" class="buyButton" onCLick=('+orderQuantity+'=41)>></div></div>'
-            var cell6 = rowElement.insertCell(5);
-            cell6.innerHTML = '<div id="'+product.id+'" class="buyButton">Buy</div>'
-            $('#'+product.id+ "QtyDown").click(function(){
-               console.log(orderQuantity)
-               orderQuantity = orderQuantity - 1;
-               cell5.innerHTML = '<div class="inputSpinner"><div class="buyButton" id="'+product.id+'QtyDown"><</div><div>'+orderQuantity+'</div><div class="buyButton" onCLick=('+orderQuantity+'=41)>></div></div>'
-            });
-            $('#'+product.id+ "QtyUp").click(function(){
-               console.log(orderQuantity)
-               orderQuantity += 1;
-               cell5.innerHTML = '<div class="inputSpinner"><div class="buyButton" id="'+product.id+'QtyDown"><</div><div>'+orderQuantity+'</div><div class="buyButton" onCLick=('+orderQuantity+'=41)>></div></div>'
-            });
-            $('#'+product.id).click(function(){
-               doProductQtyUpdate(product.id, orderQuantity)
-            });
-            
-        }
-        function updateCustomerInfo(customer){
-            var greeting = document.getElementById("greeting");
-            greeting.innerHTML = "Welcome " + customer.email + " your cash is €" + customer.cash
-        }
-        function processGetCustomerById(result){
-                for (customerAttribute of result){
-                    customerData = result[0]
-                    customer= {}
-                    customer.email = customerData.EMAIL
-                    customer.pass = customerData.PASSWORD
-                    customer.cash = customerData.CASH
-                    updateCustomerInfo(customer)
-                }
-            }
-        function processGetAllProductResponse(result){
-            for (product of result){
-                displayProduct = {}
-                displayProduct.id = product.ID
-                displayProduct.name = product.NAME
-                displayProduct.price = product.PRICE
-                displayProduct.qty = product.QTY
-                addProductToTable(displayProduct)
-            }
-        }
-        function updateTableHTML() {
-            var tableArray = getAllProducts(processGetAllProductResponse)
-            var customer = getCustomerById("jennylynch@shophere.com" ,processGetCustomerById)
-            var tableBody = document.getElementById("productTable");
+    <!--Bootstrap for pills and button styling-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script>
 
-      
+customerDetails = {}
+customerDetails.email = ""
+customerDetails.cash = 0
+
+    function updateCash(){
+        var cash = $('#cashInput').val();
+        console.log("€ " + cash);
+    }
+
+    function addProductToTable(product){
+        var tableElement = document.getElementById('productTable')
+        var rowElement = tableElement.insertRow(-1)
+        rowElement.setAttribute('id',product.ID)
+        var orderQuantity = product.qty === 0 ? 0 : 1;
+        var cell1 = rowElement.insertCell(0);
+        cell1.innerHTML = product.id
+        var cell2 = rowElement.insertCell(1);
+        cell2.innerHTML = product.name
+        var cell3 = rowElement.insertCell(2);
+        cell3.innerHTML = '<div id="'+product.id+'Price" class="buyButton">'+product.price+'</div>'
+        var cell4 = rowElement.insertCell(3);
+        cell4.innerHTML = product.qty
+        var cell5 = rowElement.insertCell(4);
+        cell5.innerHTML = '<div class="inputSpinner"><div class="buyButton" id="'+product.id+'QtyDown"><</div><div id="'+product.id+'Qty">'+orderQuantity+'</div><div id="'+product.id+'QtyUp" class="buyButton">></div></div>'
+        var cell6 = rowElement.insertCell(5);
+        cell6.innerHTML = '<div id="'+product.id+'" class="buyButton">Buy</div>'
+        
+        $('#'+product.id+ "QtyDown").click(function(v){
+            console.log(orderQuantity)
+            var newVal = orderQuantity > 1 ?  orderQuantity - 1 : orderQuantity;
+            orderQuantity = newVal;
+            console.log(orderQuantity)
+            var quantity = document.getElementById(product.id+'Qty')
+            quantity.innerHTML = orderQuantity
+        });
+        $('#'+product.id+ "QtyUp").click(function(v){
+            console.log(orderQuantity)
+            var newVal = orderQuantity >= product.qty ?  orderQuantity : orderQuantity + 1;
+            orderQuantity = newVal;
+            console.log(orderQuantity)
             
+            var quantity = document.getElementById(product.id+'Qty')
+            quantity.innerHTML = orderQuantity
+        });
+        $('#'+product.id).click(function(){
+            doProductQtyUpdate(product.id, orderQuantity)
+        });
+    }
+
+    function updateCustomerInfo(customer){
+        var greeting = document.getElementById("greeting");
+        customerDetails.email = customer.email
+        customerDetails.cash = customer.cash
+        greeting.innerHTML = "Welcome " + customer.email + " your cash is €" + customer.cash.toFixed(2);
+    }
+
+    function processGetCustomerById(result){
+            for (customerAttribute of result){
+                customerData = result[0]
+                customer= {}
+                customer.email = customerData.EMAIL
+                customer.pass = customerData.PASSWORD
+                customer.cash = customerData.CASH
+                updateCustomerInfo(customer)
+            }
+    }
+
+    function processGetAllProductResponse(result){
+        for (product of result){
+            displayProduct = {}
+            displayProduct.id = product.ID
+            displayProduct.name = product.NAME
+            displayProduct.price = product.PRICE
+            displayProduct.qty = product.QTY
+            addProductToTable(displayProduct)
         }
-        // I should set this as the default function for the callback how do i do this?
-        function doNothing(result){ 
-            return "done"
-        }
-        //***************************************update product quantity**************************************
-        function doProductQtyUpdate(id, quantity){ 
-            var productTransaction = {"id":id, "qty": quantity}
+    }
+
+    function updateTableHTML() {
+        //https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+        //gets logged in user to localStorage
+        const email = localStorage.getItem('email');
+
+        var tableArray = getAllProducts(processGetAllProductResponse)
+        var customer = getCustomerById(email ,processGetCustomerById)
+        var tableBody = document.getElementById("productTable");
+    }
+
+    function convertDisplayCustomerToServerCustomer(c){
+        serverCustomer = {}
+        serverCustomer.email = c.email
+        serverCustomer.pass = c.pass
+        serverCustomer.cash = parseFloat(c.cash)
+        return serverCustomer
+    }
+
+    function doCustomerCashUpdate(customer){ 
+        var cash = $('#cashInput').val();
+        customerDetails.cash = parseFloat(customerDetails.cash) + parseFloat(cash)
+        updateCustomerCash(convertDisplayCustomerToServerCustomer(customerDetails), doNothing)
+    }
+
+    function doNothing(result){ 
+        return "done"
+    }
+
+    function doProductQtyUpdate(id, quantity){ 
+        var productTransaction = {"id":id, "qty": quantity};
+        var cash = parseFloat(customerDetails.cash);
+        var itemPrice = parseFloat(document.getElementById(id + "Price").innerHTML);
+        if(cash > (quantity * itemPrice))
             updateProductQty(productTransaction, doNothing)
-        }
-        function updateProductQty(productTransaction, callback){
-            $.ajax({   
-                "url": "http://127.0.0.1:5000/shop/"+encodeURI(productTransaction.id),
-                "method":"PUT",
-                "data":JSON.stringify(productTransaction),
-                "dataType": "JSON",
-                contentType: "application/json; charset=utf-8",
-                "success":function(result){
-                    //console.log("put request");
-                    console.log({updateProductQtyResult: result});
-                    getAllProducts(processGetAllProductResponse)
-                    callback(result)   
-                },
-                "error":function(xhr,status,error){
-                    console.log("error: "+status+" msg:"+error);
-                }
-            });
-        }
-        function getCustomerById(id, callback){
+        else
+            alert("You cannot afford to buy this... Get a Job!")
+    }
+
+    function updateProductQty(productTransaction, callback){
+        $.ajax({   
+            "url": "http://127.0.0.1:5000/shop/"+encodeURI(productTransaction.id),
+            "method":"PUT",
+            "data":JSON.stringify(productTransaction),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                var itemPrice = parseFloat(document.getElementById(result.id + "Price").innerHTML)
+
+                customer = {}
+                customer.email = customerDetails.email
+                customer.cash = parseFloat(customerDetails.cash) - (itemPrice * result.qty)
+                updateCustomerCash(convertDisplayCustomerToServerCustomer(customer), doNothing)
+                getAllProducts(processGetAllProductResponse)
+                callback(result)   
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        })
+    }
+
+    function getCustomerById(id, callback){
         $.ajax({
             "url": "http://127.0.0.1:5000/customers/"+encodeURI(id),
             "method":"GET",
@@ -118,9 +165,28 @@ function addProductToTable(product){
             "error":function(xhr,status,error){
                 console.log("error: "+status+" msg:"+error);
             }
-        });
+        })
     } 
-        function getAllProducts(callback){
+
+    function updateCustomerCash(customer, callback){
+        console.log(customer)
+        $.ajax({   
+            "url": "http://127.0.0.1:5000/customers/"+encodeURI(customer.email),
+            "method":"PUT",
+            "data":JSON.stringify(customer),
+            "dataType": "JSON",
+            contentType: "application/json; charset=utf-8",
+            "success":function(result){
+                getCustomerById(customerDetails.email ,processGetCustomerById)
+                callback(result)   
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function getAllProducts(callback){
         $.ajax({
             "url": "http://127.0.0.1:5000/shop",
             "method":"GET",
@@ -137,20 +203,50 @@ function addProductToTable(product){
         });
     
     }
+
+    function logoutCustomer(callback){
+        $.ajax({
+            "url": "http://127.0.0.1:5000/logout",
+            "method":"GET",
+            "data":"",
+            "dataType": "JSON",
+            "success":function(result){
+                //https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+                //empties user in localStorage
+                localStorage.setItem('email', "");
+                //Redirects to root so api can handle redirect   
+                document.location.href="/";
+            },
+            "error":function(xhr,status,error){
+                console.log("error: "+status+" msg:"+error);
+            }
+        });
+    }
+
+    function logout(){
+        var email = customerDetails.email;
+        if(email)
+            logoutCustomer((email), processLogoutCustomerById)
+            function processLogoutCustomerById(result){
+                customer.email = result.email   
+            }
+    }
+     
 </script>
 </head>
 <body onload="updateTableHTML()">
 	<div class="topnav">
-		<a href="./main.html">Login</a>
 		<a class="active" href="./Products.html">Products</a>
 	</div>
 	<div class="mainContainer">
-	
-		<h1>Products</h1>
-        
-		<div id="greeting"></div>
+        <button class="btn btn-success" onclick="logout()">Logout</button>
 		<div class="pageContainer">
-            <div>
+            <h1>Products</h1>
+            <div id="greeting"></div>
+            <div id="updateCash" class="updateCash">
+                <input class="form-control" id="cashInput" value="50" type="number"></input><button class="btn btn-success" onclick={doCustomerCashUpdate(customer)} id="cash">+ Add cash</button>
+            </div>
+            <div class="tableContainer">
                 <table class="productTable">
                     <thead>
                         <tr>
@@ -163,16 +259,10 @@ function addProductToTable(product){
                         </tr>
                     </thead>
                     <tbody id="productTable">
-                        
                     </tbody>
                 </table>
             </div>
-			
-
-
-
 		</div>
 	</div>
 </body>
-
 </html>
