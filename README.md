@@ -44,31 +44,26 @@ Note that the files will only create the database / tables if they do not alread
 **All user entries have validation where they inform the user if the action has be completed.**
 
 
+- username details:
+    - email: newUser@shophere.com
+    - password: datarep 
+
 - Register New User:
-    - email: newUser@shophere.com
-    - password: datarep 
-
 - Login New User:
-    - email: newUser@shophere.com
-    - password: datarep 
-
 - Start Shopping 
     - Add Cash (Add Cash Button).
     - Alter order Quantity of product by clicking less and greater than symbols.
     - Purchase the stated order quantity for a given product via the Buy button (per row).
     - Logout.
-
 - Delete New User:
-    - email: newUser@shophere.com
-    - password: datarep 
 
 
 Extra:
 - The Login page has validation that will:
-    - Prevent login via invalud username or password.
+    - Prevent login with invalid username or password.
     - Prevent creation of new user if email already exists.
     - Alert you if trying to delete a user that doesn't exist.
-- The Products page wont allow you to increase the order quantity past the current stock levels. <br>Also try and purchase something when you don't have enough money to see what happens!**
+- The Products page wont allow you to increase the order quantity past the current stock levels. <br>Also try and purchase something when you don't have enough money to see what happens!
     
 
 <br>
