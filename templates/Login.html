@@ -108,7 +108,7 @@
             contentType: "application/json; charset=utf-8",
             "success":function(result){ 
                 if(result.customerDeleted === true){
-                    alert("User Deleted: " + result)
+                    alert("User " + id + " deleted.")
                     callback(result)  
                 }  
             },
@@ -128,7 +128,7 @@
             contentType: "application/json; charset=utf-8",
             "success":function(result){
                 if(result.createdUser === true){
-                    alert("User Created: " + result)
+                    alert(customer.email + " is now registered. ")
                     callback(result)  
                 }   
             },

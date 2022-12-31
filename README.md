@@ -19,6 +19,13 @@ This Repository contains the files to run a Clothes Shop Web Application. The RE
 
 <h2 style="color: #001a79;">Running the Application</h2>
 
+### On the Web: 
+Go to the following link:
+[http://moranc5.pythonanywhere.com/Login](http://moranc5.pythonanywhere.com/Login)
+
+
+
+### Locally:
 1. Locally host server on your computer (I used XXAMP,
 [Download here](https://www.apachefriends.org/download.html)). 
 2. Open XXAMP control panel and start MySQL and Apache. Once these services are running you can view your databases at the following [link](http://localhost/phpmyadmin/).
@@ -34,35 +41,35 @@ Note that the files will only create the database / tables if they do not alread
 
 **Note**:<br>
 **The API tracks sessions, so you can wont have to login again if you have a live session on the server.** <br>
-**All user entries have validation where they inform the user if the action can be compelted.**
+**All user entries have validation where they inform the user if the action has be completed.**
 
-### Login Page:
 
-- Valid Login data:
-    - email: andrewbeatty@shophere.com
+- Register New User:
+    - email: newUser@shophere.com
     - password: datarep 
 
-- Valid Register data:
-    - email: person@shophere.com
-    - password: pass123
+- Login New User:
+    - email: newUser@shophere.com
+    - password: datarep 
+
+- Start Shopping 
+    - Add Cash (Add Cash Button).
+    - Alter order Quantity of product by clicking less and greater than symbols.
+    - Purchase the stated order quantity for a given product via the Buy button (per row).
+    - Logout.
+
+- Delete New User:
+    - email: newUser@shophere.com
+    - password: datarep 
+
+
+Extra:
+- The Login page has validation that will:
+    - Prevent login via invalud username or password.
+    - Prevent creation of new user if email already exists.
+    - Alert you if trying to delete a user that doesn't exist.
+- The Products page wont allow you to increase the order quantity past the current stock levels. <br>Also try and purchase something when you don't have enough money to see what happens!**
     
-- Invalid Register Data:
-    - email: andrewbeatty@shophere.com
-    - password: datarep
-
-- Valid Delete data:
-    - email: ciaranmoran@shophere.com
-    
-<br>
-
-
-### Products Page:
-Once in the Products page you have the following options:
-- Add Cash (Add Cash Button).
-- Alter order Quantity of product by clicking less and greater than symbols.
-- Logout.
-
-**Note: The page wont allow you to increase the order quantity past the current stock levels. Also try and purchase something when you don't have enough money to see what happens!**
 
 <br>
 
